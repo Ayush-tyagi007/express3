@@ -82,7 +82,7 @@ app.post("/user/login", async (req, res) => {
   }
 });
 
-app.get("/user/get/:id", expiryValidator, async (req, res) => {
+app.get("/user/get", expiryValidator, async (req, res) => {
   try {
     const token = req.token;
     if (token.user_id) {
@@ -97,6 +97,22 @@ app.get("/user/get/:id", expiryValidator, async (req, res) => {
     res.send(er);
   }
 });
+app.get("user/get/:id",expiryValidator,async(req,res)=>{
+  try{
+    const user = await User.find({ _id:req.params.id }).populate(
+      "address"
+    );
+    if(userAddress){
+         res.send(user)
+   }else{
+     res.send("no user exists with this id")
+   }
+
+  }catch(er){
+    res.send(er)
+
+  }
+})
 app.put("/user/delete", expiryValidator, async (req, res) => {
   try {
     const token = req.token;
@@ -105,6 +121,22 @@ app.put("/user/delete", expiryValidator, async (req, res) => {
     res.send("user deleted");
   } catch (er) {
     res.send(er);
+  }
+});
+app.put("/user/deleteaddress", expiryValidator, async (req, res) => {
+  try {
+    const token = req.token;
+    const addressid = req.headers.addressid;
+    const id = addressid.toString();
+    await User.findOneAndUpdate(
+      { _id: token.user_id },
+      { $pull: { address: new ObjectId(id) } }
+    );
+    const deletedaddress = await address.deleteOne({
+      _id: req.headers.addressid,
+    });
+  } catch (e) {
+    res.send(e);
   }
 });
 app.get("/user/list/:page", async (req, res) => {

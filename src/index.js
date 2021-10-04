@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const md5 = require("md5");
+var jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const { User, access_token, address } = require("./model");
 const {
@@ -60,10 +61,16 @@ app.post("/user/login", async (req, res) => {
       if (user.password == givenPassword) {
         const data = {
           user_id: user._id,
-          token: md5(Date.now()),
+          token: jwt.sign(
+            {
+              user_id: user._id,
+            },
+            "secret",
+            { expiresIn: "1h" }
+          ),
         };
         await access_token.create(data);
-        res.send(user._id);
+        res.send(data.token);
       } else {
         res.status(500).send("password not matched");
       }

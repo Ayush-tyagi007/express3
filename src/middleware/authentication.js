@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const { User, access_token } = require("../model");
+const jwt = require("jsonwebtoken");
 async function auth(req, res, next) {
   try {
     const user = await User.findOne({
@@ -25,11 +26,16 @@ async function auth(req, res, next) {
 async function expiryValidator(req, res, next) {
   try {
     const token = await access_token.findOne({ token: req.headers.access });
-    if (token) {
-      req.token = token;
-      next();
-    } else {
-      res.send("token not exists");
+    try {
+      const jstoken = jwt.verify(token.token, "secret");
+      if (jstoken) {
+        req.token = token;
+        next();
+      } else {
+        res.send("token not exists");
+      }
+    } catch (err) {
+      res.send("token expired");
     }
   } catch (er) {
     res.send(er);

@@ -1,10 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const UserController = require("./controllers/UserController");
-const { auth } = require("./middleware/authentication");
-const { expiryValidator } = require("./middleware/expiryValidator");
-const { AddressDelete } = require("./controllers/AddressDelete");
-const routers = require("./routes/routes");
+const {UserRouter,UserAddressRouter}=require("./routes/index")
 const app = express();
 app.use(express.json());
 app.use(
@@ -28,7 +24,8 @@ const connectDb = () =>
     }
   });
 connectDb();
-app.use("/user", routers);
+app.use("/user", UserRouter);
+app.use("/user",UserAddressRouter)
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });

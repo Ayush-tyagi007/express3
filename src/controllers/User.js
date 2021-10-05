@@ -1,6 +1,5 @@
 const md5 = require("md5");
 var jwt = require("jsonwebtoken");
-const bodyParser = require("body-parser");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
 const { address } = require("../models/AddressModel");
@@ -49,28 +48,6 @@ const Register = async (req, res) => {
     }
   } catch (er) {
     res.send(er);
-  }
-};
-
-const UserAddress = async (req, res) => {
-  try {
-    const token = req.token;
-    const data = {
-      user_id: token.user_id,
-      phone_no: req.body.phone_no,
-      address: req.body.address,
-      city: req.body.city,
-      state: req.body.state,
-      pin_code: req.body.pin,
-    };
-    const createdAddress = await address.create(data);
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: token.user_id },
-      { $push: { address: createdAddress._id } }
-    );
-    res.send(createdAddress);
-  } catch (err) {
-    res.send(err);
   }
 };
 const UserDelete = async (req, res) => {
@@ -124,7 +101,6 @@ const UserList = async (req, res) => {
 module.exports = {
   Login,
   Register,
-  UserAddress,
   UserDelete,
   UserGet,
   UserGetId,

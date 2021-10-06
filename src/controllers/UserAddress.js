@@ -33,6 +33,9 @@ const UserAddressDelete = async (req, res) => {
       _id: req.headers.addressid,
     });
     res.send("address deleted");
+      // addressid.map(profile,key){
+
+      // }
   } catch (e) {
     res.send(e);
   }

@@ -33,19 +33,29 @@ const Login = async (req, res) => {
 };
 const Register = async (req, res) => {
   try {
-    if (req.body.password == req.body.conf_password) {
-      const data = {
-        username: req.body.username,
-        email: req.body.email,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        password: md5(req.body.password),
-      };
-      await User.create(data);
-      res.send("usercreated");
-    } else {
-      res.send("password and confirm password did not matched");
-    }
+    const newUser = new User({
+      username: req.body.username,
+      firstname: req.body.firstname,
+      lastName: req.body.lastName,
+      email: req.body.email,
+    });
+    console.log(newUser)
+    await User.register(newUser, req.body.password);
+    res.send("user registered");
+
+    // if (req.body.password == req.body.conf_password) {
+    //   const data = {
+    //     username: req.body.username,
+    //     email: req.body.email,
+    //     firstname: req.body.firstname,
+    //     lastname: req.body.lastname,
+    //     password: md5(req.body.password),
+    //   };
+    //   await User.create(data);
+    //   res.send("usercreated");
+    // } else {
+    //   res.send("password and confirm password did not matched");
+    // }
   } catch (er) {
     res.send(er);
   }

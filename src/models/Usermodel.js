@@ -25,5 +25,6 @@ const UserSchema = new mongoose.Schema({
   },
   address: [{ type: mongoose.Schema.Types.ObjectId, ref: "address" }],
 });
+UserSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User", UserSchema);
 module.exports = { User };

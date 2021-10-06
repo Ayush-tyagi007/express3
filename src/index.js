@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const{User}=require("./models/Usermodel")
 const { UserRouter, UserAddressRouter } = require("./routes");
+const  passport=require("passport")
 const app = express();
 app.use(express.json());
 app.use(
@@ -26,6 +28,8 @@ const connectDb = () =>
 connectDb();
 app.use("/user", UserRouter);
 app.use("/user", UserAddressRouter);
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });

@@ -11,8 +11,6 @@ async function auth(req, res, next) {
         res.send("username exists");
       } else if (user.email == req.body.email) {
         res.send("user with this email exist");
-      } else {
-        next();
       }
     } else {
       next();

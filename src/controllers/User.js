@@ -1,5 +1,5 @@
 const md5 = require("md5");
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
 const { address } = require("../models/AddressModel");
@@ -54,8 +54,13 @@ const UserDelete = async (req, res) => {
   try {
     const token = req.token;
     const deletedUser = await User.deleteOne({ _id: token.user_id });
-    await address.deleteMany({ user_id: token.user_id });
-    res.send("user deleted");
+    const deletionCount = await address.deleteMany({ user_id: token.user_id });
+    await access_token.deleteOne({ user_id: token.user_id });
+    if (deletionCount.deletedCount != 0) {
+      res.send("user deleted");
+    } else {
+      res.send("User deleted but this user has no addresss associated with it");
+    }
   } catch (er) {
     res.send(er);
   }
@@ -64,10 +69,14 @@ const UserGet = async (req, res) => {
   try {
     const token = req.token;
     if (token.user_id) {
-      const userAddress = await User.find({ _id: token.user_id }).populate(
+      const user = await User.findOne({ _id: token.user_id }).populate(
         "address"
       );
-      res.status(200).send(userAddress);
+      if (user) {
+        res.status(200).send(user);
+      } else {
+        res.send("user already deleted");
+      }
     } else {
       res.send("token for this user id does not exist");
     }
@@ -77,8 +86,8 @@ const UserGet = async (req, res) => {
 };
 const UserGetId = async (req, res) => {
   try {
-    const user = await User.find({ _id: req.params.id }).populate("address");
-    if (userAddress) {
+    const user = await User.findOne({ _id: req.params.id }).populate("address");
+    if (user) {
       res.send(user);
     } else {
       res.send("no user exists with this id");

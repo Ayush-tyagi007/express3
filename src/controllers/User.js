@@ -31,28 +31,10 @@ const Login = async (req, res) => {
           }
         }
       );
-      //   const givenPassword = md5(req.body.password);
-      //   if (user.password == givenPassword) {
-      //     const data = {
-      //       user_id: user._id,
-      //       token: jwt.sign(
-      //         {
-      //           user_id: user._id,
-      //         },
-      //         "secret",
-      //         { expiresIn: "1h" }
-      //       ),
-      //     };
-      //     await access_token.create(data);
-      //     res.send(data.token);
-      //   } else {
-      //     res.status(500).send("password not matched");
-      //   }
     } else {
       res.send("user not exists");
     }
   } catch (er) {
-    console.log(er);
     res.send(er);
   }
 };

@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const{User}=require("./models/Usermodel")
+const { User } = require("./models/Usermodel");
 const { UserRouter, UserAddressRouter } = require("./routes");
-const  passport=require("passport")
+var LocalStrategy = require("passport-local").Strategy;
+const passport = require("passport");
 const app = express();
 app.use(express.json());
 app.use(
@@ -10,7 +11,7 @@ app.use(
     extended: true,
   })
 );
-const port = process.env.PORT || 3000 ;
+const port = process.env.PORT || 3000;
 const connectDb = () =>
   new Promise((resolve, reject) => {
     try {

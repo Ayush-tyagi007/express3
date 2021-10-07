@@ -3,59 +3,73 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
 const { address } = require("../models/AddressModel");
+const passport = require("passport");
+var localStrategy = require("passport-local").Strategy;
 const Login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     if (user) {
-      const givenPassword = md5(req.body.password);
-      if (user.password == givenPassword) {
-        const data = {
-          user_id: user._id,
-          token: jwt.sign(
-            {
-              user_id: user._id,
-            },
-            "secret",
-            { expiresIn: "1h" }
-          ),
-        };
-        await access_token.create(data);
-        res.send(data.token);
-      } else {
-        res.status(500).send("password not matched");
-      }
+      password = req.body.password;
+      const validate = await user.authenticate(
+        password,
+        async function (cb, data) {
+          if (data) {
+            tokenData = {
+              user_id: data._id,
+              token: jwt.sign(
+                {
+                  user_id: data._id,
+                },
+                "secret",
+                { expiresIn: "1h" }
+              ),
+            };
+            const access = await access_token.create(tokenData);
+            res.send(access.token);
+          } else {
+            res.status(500).send("password not matched");
+          }
+        }
+      );
+      //   const givenPassword = md5(req.body.password);
+      //   if (user.password == givenPassword) {
+      //     const data = {
+      //       user_id: user._id,
+      //       token: jwt.sign(
+      //         {
+      //           user_id: user._id,
+      //         },
+      //         "secret",
+      //         { expiresIn: "1h" }
+      //       ),
+      //     };
+      //     await access_token.create(data);
+      //     res.send(data.token);
+      //   } else {
+      //     res.status(500).send("password not matched");
+      //   }
     } else {
       res.send("user not exists");
     }
   } catch (er) {
+    console.log(er);
     res.send(er);
   }
 };
 const Register = async (req, res) => {
   try {
-    const newUser = new User({
-      username: req.body.username,
-      firstname: req.body.firstname,
-      lastName: req.body.lastName,
-      email: req.body.email,
-    });
-    console.log(newUser)
-    await User.register(newUser, req.body.password);
-    res.send("user registered");
-
-    // if (req.body.password == req.body.conf_password) {
-    //   const data = {
-    //     username: req.body.username,
-    //     email: req.body.email,
-    //     firstname: req.body.firstname,
-    //     lastname: req.body.lastname,
-    //     password: md5(req.body.password),
-    //   };
-    //   await User.create(data);
-    //   res.send("usercreated");
-    // } else {
-    //   res.send("password and confirm password did not matched");
-    // }
+    if (req.body.password == req.body.conf_password) {
+      const newUser = new User({
+        username: req.body.username,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+      });
+      await User.register(newUser, req.body.password);
+      res.send("user registered");
+    } else {
+      res.send("password and confirm password not matched");
+    }
   } catch (er) {
     res.send(er);
   }

@@ -1,5 +1,6 @@
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
+const { reset_token } = require("../models/resetToken");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
 const { address } = require("../models/AddressModel");
@@ -107,6 +108,43 @@ const UserList = async (req, res) => {
     res.send(er);
   }
 };
+const forgotPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.body.username });
+    if (user) {
+      const tokenData = {
+        user_id: user._id,
+        token: jwt.sign(
+          {
+            user_id: user._id,
+          },
+          "secret",
+          { expiresIn: "10m" }
+        ),
+      };
+      const resettoken = await reset_token.create(tokenData);
+      res.send(resettoken.token);
+    } else {
+      res.send("no user exists with this username");
+    }
+  } catch (e) {
+    res.send(e);
+  }
+};
+const passwordReset = async (req, res) => {
+  try {
+    const token = req.token;
+    const newPassword = md5(req.body.password);
+    await User.findOneAndUpdate(
+      { _id: token.user_id },
+      { $set: { password: newPassword } }
+    );
+    await reset_token.deleteOne({ _id: token._id });
+    res.send("password changed");
+  } catch (e) {
+    res.send(e);
+  }
+};
 module.exports = {
   Login,
   Register,
@@ -114,4 +152,6 @@ module.exports = {
   UserGet,
   UserGetId,
   UserList,
+  forgotPassword,
+  passwordReset,
 };

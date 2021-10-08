@@ -16,4 +16,5 @@ router.post(
   resetTokenVerifier,
   UserController.passwordReset
 );
+router.post("/profile_image", UserController.imageUpload);
 module.exports = router;

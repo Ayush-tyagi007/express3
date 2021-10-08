@@ -4,6 +4,7 @@ const { reset_token } = require("../models/resetToken");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
 const { address } = require("../models/AddressModel");
+
 const Login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
@@ -145,6 +146,17 @@ const passwordReset = async (req, res) => {
     res.send(e);
   }
 };
+const imageUpload = async (req, res) => {
+  let storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./upload/");
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.originalname);
+    },
+  });
+  let upload = multer({ storage: storage });
+};
 module.exports = {
   Login,
   Register,
@@ -154,4 +166,5 @@ module.exports = {
   UserList,
   forgotPassword,
   passwordReset,
+  imageUpload,
 };

@@ -1,4 +1,4 @@
 const UserRouter = require("./User");
 const UserAddressRouter = require("./UserAddress");
-
-module.exports = { UserAddressRouter, UserRouter };
+const imageRouter = require("./imageUpload");
+module.exports = { UserAddressRouter, UserRouter, imageRouter };

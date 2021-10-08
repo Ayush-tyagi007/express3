@@ -9,4 +9,5 @@ router.get("/get", expiryValidator, UserController.UserGet);
 router.get("/get/:id", expiryValidator, UserController.UserGetId);
 router.put("/delete", expiryValidator, UserController.UserDelete);
 router.get("/list/:page", UserController.UserList);
+router.post("/forgotPassword",UserController.forgotPassword)
 module.exports = router;

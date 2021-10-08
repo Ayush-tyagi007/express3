@@ -21,43 +21,33 @@ const UserAddress = async (req, res) => {
     res.send(err);
   }
 };
-
-// working on it// const UserAddressDelete = async (req, res) => {
-//   try {
-//     addressArray = req.body;
-//     addressArray.forEach((element) => {
-//       console.log(element);
-//       myfunction(element);
-//     });
-
-//     async function myfunction(element) {
-//       const deletedaddress = await address.findOneAndDelete(
-//         { _id: element },
-//         { projection: { user_id: 1 } }
-//       );
-//       if (deletedaddress != null) {
-//         await User.findOneAndUpdate(
-//           { _id: deletedaddress.user_id },
-//           { $pull: { address: deletedaddress._id } }
-//         );
-//         console.log(`address deleted for this id ${element}`)
-//       } else {
-//         console.log(`no address found for this id ${element}`);
-//       }
-//     }
-//     // const token = req.token;
-//     // const addressid = req.headers.addressid;
-//     // await User.findOneAndUpdate(
-//     //   { _id: token.user_id },
-//     //   { $pull: { address: addressid } }
-//     // );
-//     // const deletedaddress = await address.deleteOne({
-//     //   _id: req.headers.addressid,
-//     // });
-//     // res.send("address deleted");
-//   } catch (e) {
-//     console.log(e);
-//     res.send(e);
-//   }
-// };
+const UserAddressDelete = async (req, res) => {
+  try {
+    addressArray = req.body;
+    addressArray.forEach((element) => {
+      addressDelete(element);
+    });
+  } catch (e) {
+    res.send(e);
+  }
+};
+async function addressDelete(element) {
+  try {
+    const deletedaddress = await address.findOneAndDelete(
+      { _id: element },
+      { projection: { user_id: 1 } }
+    );
+    if (deletedaddress != null) {
+      await User.findOneAndUpdate(
+        { _id: deletedaddress.user_id },
+        { $pull: { address: deletedaddress._id } }
+      );
+      console.log(`address deleted for this id ${element}`);
+    } else {
+      console.log(`no address found for this id ${element}`);
+    }
+  } catch (er) {
+    res.send(er);
+  }
+}
 module.exports = { UserAddress, UserAddressDelete };

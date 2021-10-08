@@ -2,6 +2,7 @@ const md5 = require("md5");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/Usermodel");
 const { access_token } = require("../models/Access_tokenModel");
+const { reset_token } = require("../models/resetToken");
 const { address } = require("../models/AddressModel");
 const passport = require("passport");
 var localStrategy = require("passport-local").Strategy;
@@ -113,6 +114,26 @@ const UserList = async (req, res) => {
     res.send(er);
   }
 };
+const forgotPassword = async (req, res) => {
+  user = await User.findOne({ username: req.body.username });
+  if (user) {
+    tokenData = {
+      user_id: user._id,
+      token: jwt.sign(
+        {
+          user_id: user._id,
+        },
+        "secret",
+        { expiresIn: "10m" }
+      ),
+    };
+    const resettoken=await reset_token.create(tokenData);
+    res.send(resettoken.token)
+  }
+  else{
+    res.send("no user exists with this username")
+  }
+};
 module.exports = {
   Login,
   Register,
@@ -120,4 +141,5 @@ module.exports = {
   UserGet,
   UserGetId,
   UserList,
+  forgotPassword,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const { User } = require("./models/Usermodel");
+const {forgotPassword}=require("./models/resetToken")
 const { UserRouter, UserAddressRouter } = require("./routes");
 var LocalStrategy = require("passport-local").Strategy;
 const passport = require("passport");

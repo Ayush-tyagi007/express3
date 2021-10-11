@@ -1,10 +1,8 @@
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
-const { reset_token } = require("../models/resetToken");
-const { User } = require("../models/Usermodel");
-const { access_token } = require("../models/Access_tokenModel");
-const { address } = require("../models/AddressModel");
-
+const multer = require("multer");
+const {access_token,address,resetToken,User}= require("../models")
+const { sendMail,response } = require("../utilities");
 const Login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
@@ -22,15 +20,15 @@ const Login = async (req, res) => {
           ),
         };
         await access_token.create(data);
-        res.send(data.token);
+        res.send(response("user token",0,data.token));
       } else {
-        res.status(500).send("password not matched");
+        res.send(response("password not matched",1));
       }
     } else {
-      res.send("user not exists");
+      res.send(response("user not exists",1));
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const Register = async (req, res) => {
@@ -43,13 +41,19 @@ const Register = async (req, res) => {
         lastname: req.body.lastname,
         password: md5(req.body.password),
       };
-      await User.create(data);
-      res.send("usercreated");
+      const user = await User.create(data);
+      const mailData = {
+        email: user.email,
+        about: "confirmation mail",
+        msg: "user registered",
+      };
+      await sendMail(mailData);
+      res.send(response("usercreated and mail sent",1));
     } else {
-      res.send("password and confirm password did not matched");
+      res.send(response("password and confirm password did not matched",1));
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const UserDelete = async (req, res) => {
@@ -64,7 +68,7 @@ const UserDelete = async (req, res) => {
       res.send("User deleted but this user has no addresss associated with it");
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const UserGet = async (req, res) => {
@@ -83,7 +87,7 @@ const UserGet = async (req, res) => {
       res.send("token for this user id does not exist");
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const UserGetId = async (req, res) => {
@@ -95,7 +99,7 @@ const UserGetId = async (req, res) => {
       res.send("no user exists with this id");
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const UserList = async (req, res) => {
@@ -106,7 +110,7 @@ const UserList = async (req, res) => {
     const users = await User.find({}).limit(limitNumber).skip(skipNumber);
     res.send(users);
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const forgotPassword = async (req, res) => {
@@ -123,13 +127,19 @@ const forgotPassword = async (req, res) => {
           { expiresIn: "10m" }
         ),
       };
-      const resettoken = await reset_token.create(tokenData);
+      const resettoken = await resetToken.create(tokenData); 
+      const mailData = {
+        email: user.email,
+        about: "reset token mail",
+        msg: `http://localhost:3000/user/verify_reset_password/${resettoken.token}`,
+      };
+      await sendMail(mailData)
       res.send(resettoken.token);
     } else {
       res.send("no user exists with this username");
     }
-  } catch (e) {
-    res.send(e);
+  } catch (er) {
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const passwordReset = async (req, res) => {
@@ -140,10 +150,10 @@ const passwordReset = async (req, res) => {
       { _id: token.user_id },
       { $set: { password: newPassword } }
     );
-    await reset_token.deleteOne({ _id: token._id });
+    await resetToken.deleteOne({ _id: token._id });
     res.send("password changed");
-  } catch (e) {
-    res.send(e);
+  } catch (er) {
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const imageUpload = async (req, res) => {
@@ -156,6 +166,7 @@ const imageUpload = async (req, res) => {
     },
   });
   let upload = multer({ storage: storage });
+  res.send("image uploaded sucess");
 };
 module.exports = {
   Login,

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const express = require("express");
-const { User } = require("../models/Usermodel");
+const { User } = require("../models");
 async function auth(req, res, next) {
   try {
     const user = await User.findOne({
@@ -16,7 +16,7 @@ async function auth(req, res, next) {
       next();
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 }
 

@@ -24,7 +24,6 @@ const connectDb = () =>
     }
   });
 connectDb();
-
 app.use("/user", UserRouter);
 app.use("/user", UserAddressRouter);
 app.use("/user", imageRouter);

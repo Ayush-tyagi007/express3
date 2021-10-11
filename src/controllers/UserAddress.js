@@ -1,5 +1,4 @@
-const { User } = require("../models/Usermodel");
-const { address } = require("../models/AddressModel");
+const { User ,address} = require("../models");
 const UserAddress = async (req, res) => {
   try {
     const token = req.token;
@@ -17,8 +16,8 @@ const UserAddress = async (req, res) => {
       { $push: { address: createdAddress._id } }
     );
     res.send(createdAddress);
-  } catch (err) {
-    res.send(err);
+  } catch (er) {
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 const UserAddressDelete = async (req, res) => {
@@ -29,12 +28,12 @@ const UserAddressDelete = async (req, res) => {
       { _id: token.user_id },
       { $pull: { address: addressid } }
     );
-    const deletedaddress = await address.deleteOne({
+    const deletedaddress = await address.deleteOne({  
       _id: req.headers.addressid,
     });
     res.send("address deleted");
-  } catch (e) {
-    res.send(e);
+  } catch (er) {
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 };
 module.exports = { UserAddress, UserAddressDelete };

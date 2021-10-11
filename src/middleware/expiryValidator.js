@@ -1,4 +1,4 @@
-const { access_token } = require("../models/Access_tokenModel");
+const { access_token } = require("../models");
 const jwt = require("jsonwebtoken");
 async function expiryValidator(req, res, next) {
   try {
@@ -11,7 +11,7 @@ async function expiryValidator(req, res, next) {
       res.send("token not exist");
     }
   } catch (er) {
-    res.send(er);
+    res.send(response([er.message||"an error generated in try block"],1));
   }
 }
 module.exports = { expiryValidator };

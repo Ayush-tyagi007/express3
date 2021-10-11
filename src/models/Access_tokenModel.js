@@ -4,4 +4,4 @@ const access_tokenSchema = new mongoose.Schema({
   token: String,
 });
 const access_token = mongoose.model("access_token", access_tokenSchema);
-module.exports = { access_token };
+module.exports = access_token;

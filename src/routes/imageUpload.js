@@ -13,7 +13,7 @@ let storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-let upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 router.post("/profile", upload.single("image"), (req, res, next) => {
   res.send(req.file);
 });

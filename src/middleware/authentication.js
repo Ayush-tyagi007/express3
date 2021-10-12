@@ -8,9 +8,9 @@ async function auth(req, res, next) {
     });
     if (user) {
       if (user.username == req.body.username) {
-        res.send("username exists");
+        res.send(response("username exists",1));
       } else if (user.email == req.body.email) {
-        res.send("user with this email exist");
+        res.send(response("user with this email exist",1));
       }
     } else {
       next();
@@ -20,4 +20,4 @@ async function auth(req, res, next) {
   }
 }
 
-module.exports = { auth };
+module.exports = auth ;

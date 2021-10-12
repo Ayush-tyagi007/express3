@@ -10,6 +10,5 @@ async function sendMail(mailData) {
     text:mailData.msg,
   };
   await sgMail.send(msg);
-  console.log(1)
 }
 module.exports = sendMail ;

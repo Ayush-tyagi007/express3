@@ -1,4 +1,5 @@
 const { User ,address} = require("../models");
+const {response}=require("../utilities")
 const UserAddress = async (req, res) => {
   try {
     const token = req.token;
@@ -15,7 +16,7 @@ const UserAddress = async (req, res) => {
       { _id: token.user_id },
       { $push: { address: createdAddress._id } }
     );
-    res.send(createdAddress);
+    res.send(response("address created",0,createdAddress));
   } catch (er) {
     res.send(response([er.message||"an error generated in try block"],1));
   }
@@ -31,7 +32,7 @@ const UserAddressDelete = async (req, res) => {
     const deletedaddress = await address.deleteOne({  
       _id: req.headers.addressid,
     });
-    res.send("address deleted");
+    res.send(response("address deleted",0));
   } catch (er) {
     res.send(response([er.message||"an error generated in try block"],1));
   }

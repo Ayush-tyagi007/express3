@@ -1,4 +1,5 @@
 const multer = require("multer");
+const {response}=require("../utilities")
 const express = require("express");
 const Image = require("../models/Imagemodel");
 const router = express.Router();
@@ -7,7 +8,7 @@ router.use(fileupload({ useTempFiles: true }));
 const cloudinary = require("cloudinary").v2;
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./upload/");
+    cb(null, "./uploads/");
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -15,7 +16,8 @@ let storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 router.post("/profile", upload.single("image"), (req, res, next) => {
-  res.send(req.file);
+  console.log(req)
+  res.send(response("image uploaded",0,req.files));
 });
 cloudinary.config({
   cloud_name: "imageupload6395",
@@ -31,13 +33,9 @@ router.post("/online_upload", upload.single("image"), async (req, res) => {
       image: imageuploaded.secure_url,
     };
     await Image.create(data);
-    res
-      .status(200)
-      .send(
-        "image uploaded successfully to cloudinary and path saved to database"
-      );
+    res.send(response("image uploaded successfully to cloudinary and path saved to database ",0))
   } catch (err) {
-    res.status(500).send("Image not saved to cloudinary");
+    res.send(response([err||"image not saved to cloudinary"],1))
   }
 });
 module.exports = router;

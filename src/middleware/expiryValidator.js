@@ -8,10 +8,10 @@ async function expiryValidator(req, res, next) {
       req.token = token;
       next();
     } else {
-      res.send("token not exist");
+      res.send(response("token not exist",1));
     }
   } catch (er) {
     res.send(response([er.message||"an error generated in try block"],1));
   }
 }
-module.exports = { expiryValidator };
+module.exports = expiryValidator;

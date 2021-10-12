@@ -1,8 +1,8 @@
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
-const {access_token,address,resetToken,User}= require("../models")
-const { sendMail,response } = require("../utilities");
+const { access_token, address, resetToken, User } = require("../models");
+const { sendMail, response } = require("../utilities");
 const Login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
@@ -20,15 +20,15 @@ const Login = async (req, res) => {
           ),
         };
         await access_token.create(data);
-        res.send(response("user token",0,data.token));
+        res.send(response("user token", 0, data.token));
       } else {
-        res.send(response("password not matched",1));
+        res.send(response("password not matched", 1));
       }
     } else {
-      res.send(response("user not exists",1));
+      res.send(response("user not exists", 1));
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const Register = async (req, res) => {
@@ -48,58 +48,59 @@ const Register = async (req, res) => {
         msg: "user registered",
       };
       await sendMail(mailData);
-      res.send(response("usercreated and mail sent",1));
+      res.send(response("usercreated and mail sent", 0));
     } else {
-      res.send(response("password and confirm password did not matched",1));
+      res.send(response("password and confirm password did not matched", 1));
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const UserDelete = async (req, res) => {
   try {
     const token = req.token;
-    const deletedUser = await User.deleteOne({ _id: token.user_id });
-    const deletionCount = await address.deleteMany({ user_id: token.user_id });
-    await access_token.deleteOne({ user_id: token.user_id });
-    if (deletionCount.deletedCount != 0) {
-      res.send("user deleted");
+    await User.deleteOne({ _id: token.user_id });
+    const AddressDeleted = await address.deleteMany({ user_id: token.user_id });
+    await access_token.deleteMany({ user_id: token.user_id });
+    if (AddressDeleted.deletedCount != 0) {
+      res.send(response("User deleted", 0));
     } else {
-      res.send("User deleted but this user has no addresss associated with it");
+      res.send(
+        response(
+          "User deleted but this user has no addresss associated with it",
+          1
+        )
+      );
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const UserGet = async (req, res) => {
   try {
     const token = req.token;
-    if (token.user_id) {
       const user = await User.findOne({ _id: token.user_id }).populate(
         "address"
       );
       if (user) {
-        res.status(200).send(user);
+        res.send(response("user ", 0, user));
       } else {
-        res.send("user already deleted");
+        res.send(response("user not found", 1));
       }
-    } else {
-      res.send("token for this user id does not exist");
-    }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const UserGetId = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id }).populate("address");
     if (user) {
-      res.send(user);
+      res.send(response("user", 0, user));
     } else {
-      res.send("no user exists with this id");
+      res.send(response("no user exists with this id", 1));
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const UserList = async (req, res) => {
@@ -108,9 +109,9 @@ const UserList = async (req, res) => {
     const limitNumber = 10;
     const skipNumber = page * 10;
     const users = await User.find({}).limit(limitNumber).skip(skipNumber);
-    res.send(users);
+    res.send(response("users", 0, users));
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const forgotPassword = async (req, res) => {
@@ -127,19 +128,19 @@ const forgotPassword = async (req, res) => {
           { expiresIn: "10m" }
         ),
       };
-      const resettoken = await resetToken.create(tokenData); 
+      const resettoken = await resetToken.create(tokenData);
       const mailData = {
         email: user.email,
         about: "reset token mail",
         msg: `http://localhost:3000/user/verify_reset_password/${resettoken.token}`,
       };
-      await sendMail(mailData)
-      res.send(resettoken.token);
+      await sendMail(mailData);
+      res.send(response("token", 0, resettoken.token));
     } else {
-      res.send("no user exists with this username");
+      res.send(response("no user exists with this username", 1));
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const passwordReset = async (req, res) => {
@@ -151,9 +152,9 @@ const passwordReset = async (req, res) => {
       { $set: { password: newPassword } }
     );
     await resetToken.deleteOne({ _id: token._id });
-    res.send("password changed");
+    res.send(response("password changed", 0));
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 };
 const imageUpload = async (req, res) => {
@@ -166,7 +167,7 @@ const imageUpload = async (req, res) => {
     },
   });
   let upload = multer({ storage: storage });
-  res.send("image uploaded sucess");
+  res.send(response("image uploaded sucessfully", 0));
 };
 module.exports = {
   Login,
@@ -177,5 +178,5 @@ module.exports = {
   UserList,
   forgotPassword,
   passwordReset,
-  imageUpload,
+  imageUpload
 };

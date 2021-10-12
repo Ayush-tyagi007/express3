@@ -1,8 +1,7 @@
 const express = require("express");
 const { UserController } = require("../controllers");
-const { auth } = require("../middleware/authentication");
-const { expiryValidator } = require("../middleware/expiryValidator");
-const { resetTokenVerifier } = require("../middleware/resetTokenVerifier");
+const { UserAddress } = require("../controllers/UserAddress");
+const {auth,expiryValidator,resetTokenVerifier}=require("../middleware")
 const router = express.Router();
 router.post("/register", auth, UserController.Register);
 router.post("/login", UserController.Login);
@@ -16,5 +15,6 @@ router.post(
   resetTokenVerifier,
   UserController.passwordReset
 );
-router.post("/profile_image", UserController.imageUpload);
+router.post("/profile_image",UserController.imageUpload);
+  
 module.exports = router;

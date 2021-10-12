@@ -11,7 +11,7 @@ router.get("/list/:page", UserController.UserList);
 router.post("/forgotPassword", UserController.forgotPassword);
 router.post(
   "/verify_reset_password/:password_reset_token",
-  resetTokenVerifier,
+  expiryValidator,
   UserController.passwordReset
 );
 module.exports = router;

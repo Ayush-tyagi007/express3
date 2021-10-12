@@ -145,11 +145,17 @@ const passwordReset = async (req, res) => {
   try {
     const token = req.token;
     const newPassword = md5(req.body.password);
-    await User.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(
       { _id: token.user_id },
       { $set: { password: newPassword } }
     );
     await access_token.deleteOne({ _id: token._id });
+    const mailData = {
+      email: user.email,
+      about: "Confirmation Mail",
+      msg: "password changed successfully",
+    };
+    await sendMail(mailData);
     res.send(response("password changed", 0));
   } catch (er) {
     res.send(response([er.message || "an error generated in try block"], 1));

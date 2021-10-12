@@ -12,7 +12,6 @@ async function expiryValidator(req, res, next) {
       res.send(response("token not exist", 1));
     }
   } catch (er) {
-    console.log(er);
     res.send(response([er.message || "an error generated in try block"], 1));
   }
 }

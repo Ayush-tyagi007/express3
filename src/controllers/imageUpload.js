@@ -5,7 +5,7 @@ const fileupload = require("express-fileupload");
 const imageUploadLocally = async (req, res) => {
   try {
     const token = req.token;
-    data = {
+    const data = {
       image: req.file.originalname,
       user_id: token.user_id,
     };

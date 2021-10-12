@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const { User } = require("../models");
+const { response } = require("../utilities");
 async function auth(req, res, next) {
   try {
     const user = await User.findOne({

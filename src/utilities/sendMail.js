@@ -1,4 +1,4 @@
-let sgMail = require("@sendgrid/mail");
+const sgMail = require("@sendgrid/mail");
 async function sendMail(mailData) {
   const SENDGRID_API_KEY =
     "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";

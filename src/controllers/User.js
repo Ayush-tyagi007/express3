@@ -1,7 +1,7 @@
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
-const { access_token, address, resetToken, User } = require("../models");
+const { access_token, address, User } = require("../models");
 const { sendMail, response } = require("../utilities");
 const Login = async (req, res) => {
   try {
@@ -79,14 +79,12 @@ const UserDelete = async (req, res) => {
 const UserGet = async (req, res) => {
   try {
     const token = req.token;
-      const user = await User.findOne({ _id: token.user_id }).populate(
-        "address"
-      );
-      if (user) {
-        res.send(response("user ", 0, user));
-      } else {
-        res.send(response("user not found", 1));
-      }
+    const user = await User.findOne({ _id: token.user_id }).populate("address");
+    if (user) {
+      res.send(response("user ", 0, user));
+    } else {
+      res.send(response("user not found", 1));
+    }
   } catch (er) {
     res.send(response([er.message || "an error generated in try block"], 1));
   }
@@ -128,7 +126,7 @@ const forgotPassword = async (req, res) => {
           { expiresIn: "10m" }
         ),
       };
-      const resettoken = await resetToken.create(tokenData);
+      const resettoken = await access_token.create(tokenData);
       const mailData = {
         email: user.email,
         about: "reset token mail",
@@ -151,23 +149,11 @@ const passwordReset = async (req, res) => {
       { _id: token.user_id },
       { $set: { password: newPassword } }
     );
-    await resetToken.deleteOne({ _id: token._id });
+    await access_token.deleteOne({ _id: token._id });
     res.send(response("password changed", 0));
   } catch (er) {
     res.send(response([er.message || "an error generated in try block"], 1));
   }
-};
-const imageUpload = async (req, res) => {
-  let storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "./upload/");
-    },
-    filename: (req, file, cb) => {
-      cb(null, file.originalname);
-    },
-  });
-  let upload = multer({ storage: storage });
-  res.send(response("image uploaded sucessfully", 0));
 };
 module.exports = {
   Login,
@@ -178,5 +164,4 @@ module.exports = {
   UserList,
   forgotPassword,
   passwordReset,
-  imageUpload
 };

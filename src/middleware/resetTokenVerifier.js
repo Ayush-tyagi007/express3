@@ -10,10 +10,10 @@ async function resetTokenVerifier(req, res, next) {
       req.token = token;
       next();
     } else {
-      res.send(response("token not exist",1));
+      res.send(response("token not exist", 1));
     }
   } catch (er) {
-    res.send(response([er.message||"an error generated in try block"],1));
+    res.send(response([er.message || "an error generated in try block"], 1));
   }
 }
 module.exports = resetTokenVerifier;

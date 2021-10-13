@@ -28,7 +28,7 @@ const Login = async (req, res) => {
       res.send(response("user not exists", 1));
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const Register = async (req, res) => {
@@ -53,15 +53,15 @@ const Register = async (req, res) => {
       res.send(response("password and confirm password did not matched", 1));
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const UserDelete = async (req, res) => {
   try {
-    const token = req.token;
-    await User.deleteOne({ _id: token.user_id });
-    const AddressDeleted = await address.deleteMany({ user_id: token.user_id });
-    await access_token.deleteMany({ user_id: token.user_id });
+    const user_id = req.user_id;
+    await User.deleteOne({ _id: user_id });
+    const AddressDeleted = await address.deleteMany({ user_id: user_id });
+    await access_token.deleteMany({ user_id: user_id });
     if (AddressDeleted.deletedCount != 0) {
       res.send(response("User deleted", 0));
     } else {
@@ -73,20 +73,21 @@ const UserDelete = async (req, res) => {
       );
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const UserGet = async (req, res) => {
   try {
-    const token = req.token;
-    const user = await User.findOne({ _id: token.user_id }).populate("address");
+    throw errr;
+    const user_id = req.user_id;
+    const user = await User.findOne({ _id: user_id }).populate("address");
     if (user) {
       res.send(response("user ", 0, user));
     } else {
       res.send(response("user not found", 1));
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const UserGetId = async (req, res) => {
@@ -98,7 +99,7 @@ const UserGetId = async (req, res) => {
       res.send(response("no user exists with this id", 1));
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const UserList = async (req, res) => {
@@ -109,7 +110,7 @@ const UserList = async (req, res) => {
     const users = await User.find({}).limit(limitNumber).skip(skipNumber);
     res.send(response("users", 0, users));
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const forgotPassword = async (req, res) => {
@@ -138,27 +139,27 @@ const forgotPassword = async (req, res) => {
       res.send(response("no user exists with this username", 1));
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const passwordReset = async (req, res) => {
   try {
-    const token = req.token;
+    const user_id = req.user_id;
     const newPassword = md5(req.body.password);
-    const user = await User.findOneAndUpdate(
-      { _id: token.user_id },
+    const USER = await User.findOneAndUpdate(
+      { _id: user_id },
       { $set: { password: newPassword } }
     );
-    await access_token.deleteOne({ _id: token._id });
+    await access_token.deleteOne({ user_id: user_id });
     const mailData = {
-      email: user.email,
+      email: USER.email,
       about: "Confirmation Mail",
       msg: "password changed successfully",
     };
     await sendMail(mailData);
     res.send(response("password changed", 0));
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 module.exports = {

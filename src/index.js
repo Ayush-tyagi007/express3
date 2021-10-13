@@ -24,9 +24,7 @@ const connectDb = () =>
     }
   });
 connectDb();
-app.use("/user", UserRouter);
-app.use("/user", UserAddressRouter);
-app.use("/user", imageRouter);
+app.use("/user", UserRouter, UserAddressRouter, imageRouter);
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });

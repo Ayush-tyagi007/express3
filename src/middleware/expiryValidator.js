@@ -6,7 +6,7 @@ async function expiryValidator(req, res, next) {
     jwt.verify(req.headers.access, "secret");
     const token = await access_token.findOne({ token: req.headers.access });
     if (token) {
-      req.token = token;
+      req.user_id = token.user_id;
       next();
     } else {
       res.send(response("token not exist", 1));

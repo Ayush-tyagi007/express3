@@ -2,9 +2,9 @@ const { User, address } = require("../models");
 const { response } = require("../utilities");
 const UserAddress = async (req, res) => {
   try {
-    const token = req.token;
+    const user_id = req.user_id;
     const data = {
-      user_id: token.user_id,
+      user_id: user_id,
       phone_no: req.body.phone_no,
       address: req.body.address,
       city: req.body.city,
@@ -13,7 +13,7 @@ const UserAddress = async (req, res) => {
     };
     const createdAddress = await address.create(data);
     const updatedUser = await User.findOneAndUpdate(
-      { _id: token.user_id },
+      { _id: user_id },
       { $push: { address: createdAddress._id } }
     );
     res.send(response("address created", 0, createdAddress));
@@ -23,10 +23,10 @@ const UserAddress = async (req, res) => {
 };
 const UserAddressDelete = async (req, res) => {
   try {
-    const token = req.token;
+    const user_id = req.user_id;
     const addressid = req.headers.addressid;
     await User.findOneAndUpdate(
-      { _id: token.user_id },
+      { _id: user_id },
       { $pull: { address: addressid } }
     );
     const deletedaddress = await address.deleteOne({

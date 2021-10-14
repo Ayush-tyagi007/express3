@@ -8,7 +8,7 @@ app.use(
     extended: true,
   })
 );
-const port = 3000 || process.env.PORT;
+const port = process.env.PORT|| 3000;
 const connectDb = () =>
   new Promise((resolve, reject) => {
     try {

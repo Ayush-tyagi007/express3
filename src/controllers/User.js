@@ -78,7 +78,6 @@ const UserDelete = async (req, res) => {
 };
 const UserGet = async (req, res) => {
   try {
-    throw errr;
     const user_id = req.user_id;
     const user = await User.findOne({ _id: user_id }).populate("address");
     if (user) {

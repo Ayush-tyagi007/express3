@@ -17,7 +17,7 @@ async function auth(req, res, next) {
       next();
     }
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 }
 

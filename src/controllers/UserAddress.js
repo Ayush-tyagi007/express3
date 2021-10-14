@@ -18,7 +18,7 @@ const UserAddress = async (req, res) => {
     );
     res.send(response("address created", 0, createdAddress));
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 const UserAddressDelete = async (req, res) => {
@@ -34,7 +34,7 @@ const UserAddressDelete = async (req, res) => {
     });
     res.send(response("address deleted", 0));
   } catch (er) {
-    res.send(response([er.message || "an error generated in try block"], 1));
+    res.send(response(er.message || "an error generated in try block", 1));
   }
 };
 module.exports = { UserAddress, UserAddressDelete };
